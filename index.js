@@ -84,15 +84,12 @@ function authentication() {
 	req.end()
 }
 
-function departments() {
-	console.log('in the departments function ...')
-	// Create and encode parameters
-	var parameters = {
-		limit: 1,
-	}
+var patient_id
 
-	var query = '?' + querystring.stringify(parameters)
-	var apiPath = path_join(version, practiceid, '/departments')
+function get_patient() {
+	console.log('getting the patient')
+
+	var apiPath = path_join(version, practiceid, '/patients', patient_id)
 	console.log(apiPath)
 
 	var req = https.request({
@@ -108,7 +105,7 @@ function departments() {
 			content += chunk
 		})
 		response.on('end', function() {
-			console.log('Department:')
+			console.log('Patient:')
 			console.log(JSON.parse(content))
 			signal.emit('next')
 		})
@@ -119,8 +116,6 @@ function departments() {
 
 	req.end()
 }
-
-var patient_id
 
 function create_patient() {
 	console.log('creating a patient')
@@ -157,8 +152,8 @@ function create_patient() {
 		response.on('end', function() {
 			console.log('Patient created:')
 			var patientResponse = JSON.parse(content)
-
-			console.log(patientResponse[0].patientid)
+			patient_id = patientResponse[0].patientid
+			console.log(patient_id)
 			signal.emit('next')
 		})
 	})
@@ -173,7 +168,7 @@ function create_patient() {
 // This is one way of forcing the call order
 function main() {
 	console.log('in the main function')
-	var calls = [authentication, create_patient]
+	var calls = [authentication, create_patient, get_patient]
 	signal.on('next', function() {
 		var nextCall = calls.shift()
 		if (nextCall) {
