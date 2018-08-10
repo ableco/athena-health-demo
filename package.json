@@ -1,0 +1,17 @@
+{
+  "name": "athenahealth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "native.js",
+  "scripts": {
+    "test": "node ./testing.js",
+    "start":"node ./index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "events": "^3.0.0",
+    "https": "^1.0.0",
+    "querystring": "^0.2.0"
+  }
+}
