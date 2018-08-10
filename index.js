@@ -165,10 +165,43 @@ function create_patient() {
 	req.end()
 }
 
+function get_lab_results() {
+	console.log('getting the patient\'s lab results')
+
+	// /preview1/:practiceid/chart/:patientid/labresults
+	var apiPath = path_join(version, practiceid, '/chart', patient_id, 'labresults')
+	console.log(apiPath)
+
+	var req = https.request({
+		hostname: 'api.athenahealth.com',
+		method: 'GET',
+		path: apiPath + '?departmentid=1',
+		// We set the auth header ourselves this time, because we have a token now.
+		headers: {'authorization': 'Bearer ' + token},
+	}, function(response) {
+		response.setEncoding('utf8')
+		var content = ''
+		response.on('data', function(chunk) {
+			content += chunk
+		})
+		response.on('end', function() {
+			console.log('Lab Results:')
+			console.log(JSON.parse(content))
+			signal.emit('next')
+		})
+	})
+	req.on('error', function(e) {
+		console.log(e.message)
+	})
+
+	req.end()
+
+}
+
 // This is one way of forcing the call order
 function main() {
 	console.log('in the main function')
-	var calls = [authentication, create_patient, get_patient]
+	var calls = [authentication, create_patient, get_patient, get_lab_results]
 	signal.on('next', function() {
 		var nextCall = calls.shift()
 		if (nextCall) {
